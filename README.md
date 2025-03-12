@@ -32,8 +32,8 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
 1. **Clona este repositorio**:
    ```bash
-   git clone https://github.com/victoMR/mongodb-google-cloud-terraform.git
-   cd mongodb-google-cloud-terraform
+   git clone https://github.com/victoMR/proyectLogs
+   cd proyectLogs
    ```
 
 2. **Configura las credenciales de Google Cloud**:
