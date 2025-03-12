@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --primary-hover: #2980b9;
+      --text-color: #333;
+      --light-gray: #f5f7fa;
+      --border-color: #dbe0e6;
+      --error-color: #e74c3c;
+      --success-color: #2ecc71;
+      --admin-color: #9b59b6;
+      --admin-hover: #8e44ad;
+      --supervisor-color: #f39c12;
+      --operador-color: #2ecc71;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      color: var(--text-color);
+      background-color: var(--light-gray);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--admin-color);
+      display: flex;
+      align-items: center;
+    }
+    .logo i {
+      margin-right: 10px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    .user-name {
+      margin-right: 15px;
+      font-weight: 600;
+    }
+    .logout-btn {
+      background-color: transparent;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+    }
+    .logout-btn:hover {
+      background-color: #f1f1f1;
+    }
+    .logout-btn i {
+      margin-right: 8px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+    .btn i {
+      margin-right: 8px;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    th {
+      font-weight: 600;
+      background-color: var(--light-gray);
+    }
+    tbody tr:hover {
+      background-color: rgba(245, 247, 250, 0.5);
+    }
+    .user-role {
+      padding: 6px 10px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .role-admin {
+      background-color: rgba(155, 89, 182, 0.1);
+      color: var(--admin-color);
+    }
+    .role-supervisor {
+      background-color: rgba(243, 156, 18, 0.1);
+      color: var(--supervisor-color);
+    }
+    .role-operador {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: var(--operador-color);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      animation: modalAnimation 0.3s;
+    }
+    .modal-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #999;
+    }
+    .modal-body {
+      padding: 25px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    .form-select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 15px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 20px;
+    }
+    .modal-footer {
+      padding: 15px 25px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+    }
+    .modal-footer .btn {
+      margin-left: 10px;
+    }
+    .btn-secondary {
+      background-color: #e9ecef;
+      color: var(--text-color);
+    }
+    .btn-secondary:hover {
+      background-color: #dee2e6;
+    }
+    .message {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      display: none;
+    }
+    .message.error {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+    .message.success {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(46, 204, 113, 0.2);
+    }
+    .message i {
+      margin-right: 10px;
+    }
+    .input-group {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #a0aec0;
+    }
+    @keyframes modalAnimation {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .user-info {
+        margin-top: 15px;
+      }
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .card-header .btn {
+        margin-top: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-user-shield"></i> Panel de Administración
+      </div>
+      <div class="user-info">
+        <div class="user-name">
+          <i class="fas fa-user"></i> <span id="currentUsername">admin</span>
+        </div>
+        <a href="/logout" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+        </a>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <i class="fas fa-users"></i> Gestión de Usuarios
+        </h2>
+        <button id="addUserBtn" class="btn btn-primary">
+          <i class="fas fa-user-plus"></i> Nuevo Usuario
+        </button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Intentos Fallidos</th>
+              <th>Último Intento</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <!-- Los usuarios se cargarán dinámicamente mediante JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregar un nuevo usuario -->
+  <div id="addUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-user-plus"></i> Agregar Nuevo Usuario
+        </h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalMessage" class="message"></div>
+        <form id="addUserForm">
+          <div class="form-group">
+            <label for="newUsername">Nombre de Usuario</label>
+            <input type="text" id="newUsername" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Contraseña</label>
+            <div class="input-group">
+              <input type="password" id="newPassword" class="form-control" required>
+              <i class="toggle-password fas fa-eye"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar Contraseña</label>
+            <div class="input-group">
+              <input type="password" id="confirmPassword" class="form-control" required>
+              <i class="toggle-confirm-password fas fa-eye"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="userRole">Rol</label>
+            <select id="userRole" class="form-select" required>
+              <option value="">Seleccione un rol</option>
+              <option value="admin">Administrador</option>
+              <option value="pepe">Pepe</option>
+              <option value="pepito">Pepito</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelUserBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveUserBtn">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Obtener referencia al nombre de usuario en la sesión
+    document.addEventListener('DOMContentLoaded', function() {
+      // Cargar el nombre de usuario desde la sesión
+      const username = sessionStorage.getItem('username') || 'admin';
+      document.getElementById('currentUsername').textContent = username;
+
+      // Cargar la lista de usuarios
+      loadUsers();
+
+      // Event listeners para el modal
+      document.getElementById('addUserBtn').addEventListener('click', function() {
+        openModal('addUserModal');
+      });
+
+      document.querySelectorAll('.close-modal').forEach(function(button) {
+        button.addEventListener('click', function() {
+          closeModal('addUserModal');
+        });
+      });
+
+      document.getElementById('cancelUserBtn').addEventListener('click', function() {
+        closeModal('addUserModal');
+      });
+
+      document.getElementById('saveUserBtn').addEventListener('click', function() {
+        saveUser();
+      });
+
+      // Toggle password visibility
+      const togglePassword = document.querySelector('.toggle-password');
+      const passwordInput = document.getElementById('newPassword');
+
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+
+      // Toggle confirm password visibility
+      const toggleConfirmPassword = document.querySelector('.toggle-confirm-password');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+
+      toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+    });
+
+    // Función para cargar usuarios
+    async function loadUsers() {
+      try {
+        const response = await fetch('/users');
+        if (response.ok) {
+          const users = await response.json();
+          displayUsers(users);
+        } else {
+          showMessage('error', 'Error al cargar usuarios: ' + (await response.text()));
+        }
+      } catch (err) {
+        showMessage('error', 'Error de conexión: ' + err.message);
+      }
+    }
+
+    // Función para mostrar usuarios en la tabla
+    function displayUsers(users) {
+      const tableBody = document.getElementById('userTableBody');
+      tableBody.innerHTML = '';
+
+      users.forEach(user => {
+        const tr = document.createElement('tr');
+        
+        // Columna de nombre de usuario
+        const tdUsername = document.createElement('td');
+        tdUsername.textContent = user.username;
+        tr.appendChild(tdUsername);
+        
+        // Columna de rol
+        const tdRole = document.createElement('td');
+        const roleSpan = document.createElement('span');
+        roleSpan.className = `user-role role-${user.role}`;
+        roleSpan.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        tdRole.appendChild(roleSpan);
+        tr.appendChild(tdRole);
+        
+        // Columna de intentos fallidos
+        const tdFailedAttempts = document.createElement('td');
+        tdFailedAttempts.textContent = user.failedAttempts || 0;
+        tr.appendChild(tdFailedAttempts);
+        
+        // Columna de último intento fallido
+        const tdLastAttempt = document.createElement('td');
+        if (user.lastFailedAttempt) {
+          const date = new Date(user.lastFailedAttempt);
+          tdLastAttempt.textContent = date.toLocaleString();
+        } else {
+          tdLastAttempt.textContent = 'N/A';
+        }
+        tr.appendChild(tdLastAttempt);
+        
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // Función para abrir modal
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'flex';
+      // Limpiar formulario
+      if (modalId === 'addUserModal') {
+        document.getElementById('addUserForm').reset();
+        document.getElementById('modalMessage').style.display = 'none';
+      }
+    }
+
+    // Función para cerrar modal
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Función para mostrar mensajes
+    function showMessage(type, content, isModal = false) {
+      const messageElement = isModal ? 
+        document.getElementById('modalMessage') : 
+        document.getElementById('message');
+      
+      messageElement.className = `message ${type}`;
+      const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
+      messageElement.innerHTML = `<i class="fas ${icon}"></i> ${content}`;
+      messageElement.style.display = 'flex';
+    }
+
+    // Función para registrar un nuevo usuario
+    async function saveUser() {
+      const username = document.getElementById('newUsername').value;
+      const password = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const role = document.getElementById('userRole').value;
+
+      // Validar campos
+      if (!username || !password || !confirmPassword || !role) {
+        showMessage('error', 'Todos los campos son obligatorios', true);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showMessage('error', 'Las contraseñas no coinciden', true);
+        return;
+      }
+
+      try {
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            role
+          })
+        });
+
+        if (response.ok) {
+          // Mostrar mensaje de éxito
+          showMessage('success', 'Usuario registrado exitosamente');
+          // Cerrar modal
+          closeModal('addUserModal');
+          // Recargar lista de usuarios
+          loadUsers();
+        } else {
+          showMessage('error', await response.text(), true);
+        }
+      } catch (err) {
+        showMessage('error', 'Error de conexión: ' + err.message, true);
+      }
+    }
+
+    // Cerrar el modal si se hace clic fuera de él
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('addUserModal');
+      if (event.target === modal) {
+        closeModal('addUserModal');
+      }
+    });
+  </script>
+</body>
+</html>

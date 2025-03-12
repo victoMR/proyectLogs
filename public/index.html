@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Usuarios | Iniciar Sesión</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --primary-hover: #2980b9;
+      --text-color: #333;
+      --light-gray: #f5f7fa;
+      --border-color: #dbe0e6;
+      --error-color: #e74c3c;
+      --success-color: #2ecc71;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      color: var(--text-color);
+      background-color: var(--light-gray);
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 25px 30px 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-body {
+      padding: 30px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #7a8599;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .tab:hover {
+      color: var(--primary-color);
+    }
+
+    .tab.active {
+      color: var(--primary-color);
+    }
+
+    .tab-indicator {
+      position: absolute;
+      bottom: -1px;
+      height: 3px;
+      background-color: var(--primary-color);
+      transition: all 0.3s ease;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #4a5568;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #a0aec0;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #a0aec0;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.error {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(231, 76, 60, 0.2);
+      display: flex;
+      align-items: center;
+    }
+
+    .message.success {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(46, 204, 113, 0.2);
+      display: flex;
+      align-items: center;
+    }
+
+    .message i {
+      margin-right: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #7a8599;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="logo">
+        <i class="fas fa-user-shield"></i> Sistema de Usuarios
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="tabs">
+        <div class="tab active" data-tab="login">Iniciar Sesión</div>
+        <div class="tab" data-tab="reset">Recuperar Contraseña</div>
+        <div class="tab-indicator"></div>
+      </div>
+
+      <div id="message" class="message"></div>
+
+      <div id="loginTab" class="tab-content active">
+        <form id="loginForm" action="/login" method="POST">
+          <div class="form-group">
+            <label for="username">Nombre de Usuario</label>
+            <div class="input-group">
+              <i class="input-icon fas fa-user"></i>
+              <input type="text" id="username" class="form-control" name="username" placeholder="Ingrese su nombre de usuario" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <div class="input-group">
+              <i class="input-icon fas fa-lock"></i>
+              <input type="password" id="password" class="form-control" name="password" placeholder="Ingrese su contraseña" required>
+              <i class="toggle-password fas fa-eye"></i>
+            </div>
+          </div>
+
+          <button type="submit" class="btn">
+            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+          </button>
+        </form>
+      </div>
+
+      <div id="resetTab" class="tab-content">
+        <form id="resetForm" action="/reset-password" method="POST">
+          <div class="form-group">
+            <label for="resetUsername">Nombre de Usuario</label>
+            <div class="input-group">
+              <i class="input-icon fas fa-user"></i>
+              <input type="text" id="resetUsername" class="form-control" name="username" placeholder="Ingrese su nombre de usuario" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">Nueva Contraseña</label>
+            <div class="input-group">
+              <i class="input-icon fas fa-lock"></i>
+              <input type="password" id="newPassword" class="form-control" name="newPassword" placeholder="Ingrese su nueva contraseña" required>
+              <i class="toggle-new-password fas fa-eye"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar Contraseña</label>
+            <div class="input-group">
+              <i class="input-icon fas fa-lock"></i>
+              <input type="password" id="confirmPassword" class="form-control" name="confirmPassword" placeholder="Confirme su nueva contraseña" required>
+              <i class="toggle-confirm-password fas fa-eye"></i>
+            </div>
+          </div>
+
+          <button type="submit" class="btn">
+            <i class="fas fa-key"></i> Restablecer Contraseña
+          </button>
+        </form>
+      </div>
+
+      <div class="footer">
+        © 2025 Sistema de Usuarios. Todos los derechos reservados.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Set up tab functionality
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabIndicator = document.querySelector('.tab-indicator');
+
+    function updateTabIndicator(activeTab) {
+      tabIndicator.style.width = `${activeTab.offsetWidth}px`;
+      tabIndicator.style.left = `${activeTab.offsetLeft}px`;
+    }
+
+    function showTab(tabName) {
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      const activeTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+      activeTab.classList.add('active');
+      document.getElementById(`${tabName}Tab`).classList.add('active');
+
+      updateTabIndicator(activeTab);
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        showTab(tab.dataset.tab);
+      });
+    });
+
+    // Initialize tab indicator
+    updateTabIndicator(document.querySelector('.tab.active'));
+
+    // Toggle password visibility
+    const togglePassword = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    // Toggle new password visibility
+    const toggleNewPassword = document.querySelector('.toggle-new-password');
+    const newPasswordInput = document.getElementById('newPassword');
+
+    if (toggleNewPassword && newPasswordInput) {
+      toggleNewPassword.addEventListener('click', function() {
+        const type = newPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        newPasswordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+    }
+
+    // Toggle confirm password visibility
+    const toggleConfirmPassword = document.querySelector('.toggle-confirm-password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    if (toggleConfirmPassword && confirmPasswordInput) {
+      toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPasswordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+    }
+
+    // Display messages
+    function showMessage(type, content) {
+      const messageElement = document.getElementById('message');
+      messageElement.className = `message ${type}`;
+
+      const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
+      messageElement.innerHTML = `<i class="fas ${icon}"></i> ${content}`;
+      messageElement.style.display = 'flex';
+
+      // Scroll to top of form to show the message
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Check for error parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error) {
+      showMessage('error', decodeURIComponent(error));
+    }
+
+    // Handle login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            showMessage('success', result.message);
+            setTimeout(() => {
+              window.location.href = result.redirectTo;
+            }, 1000);
+          }
+        } else {
+          const errorText = await response.text();
+          showMessage('error', errorText);
+        }
+      } catch (err) {
+        showMessage('error', 'Error al conectar con el servidor. Por favor intente más tarde.');
+      }
+    });
+
+    // Handle reset password form submission
+    document.getElementById('resetForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('resetUsername').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showMessage('error', 'Las contraseñas no coinciden');
+        return;
+      }
+
+      try {
+        const response = await fetch('/reset-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            newPassword
+          })
+        });
+
+        const result = await response.text();
+        if (response.ok) {
+          showMessage('success', result);
+          // Limpiar el formulario
+          document.getElementById('resetForm').reset();
+          // Cambiar a la pestaña de inicio de sesión después de 2 segundos
+          setTimeout(() => {
+            showTab('login');
+          }, 2000);
+        } else {
+          showMessage('error', result);
+        }
+      } catch (err) {
+        showMessage('error', 'Error al conectar con el servidor. Por favor intente más tarde.');
+      }
+    });
+  </script>
+</body>
+</html>
