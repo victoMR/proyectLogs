@@ -7,15 +7,28 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-color: #3498db;
-      --primary-hover: #2980b9;
-      --secondary-color: #2ecc71;
-      --secondary-hover: #27ae60;
-      --text-color: #333;
-      --light-gray: #f5f7fa;
-      --border-color: #dbe0e6;
-      --error-color: #e74c3c;
-      --success-color: #2ecc71;
+      --primary-color: #3a59ca;
+      --primary-light: #4f7dfd;
+      --primary-dark: #2a3f9e;
+      --accent-color: #6c63ff;
+      --text-dark: #2d3748;
+      --text-light: #a0aec0;
+      --text-medium: #718096;
+      --bg-color: #f7fafc;
+      --white: #ffffff;
+      --error-color: #e53e3e;
+      --success-color: #38a169;
+      --border-color: #e2e8f0;
+
+      --google-color: #ea4335;
+      --github-color: #24292e;
+      --microsoft-color: #00a4ef;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.05);
+
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -25,124 +38,140 @@
     }
 
     body {
-      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
-      color: var(--text-color);
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      line-height: 1.6;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, 'Helvetica Neue', sans-serif;
+      color: var(--text-dark);
+      background-color: var(--bg-color);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
       display: flex;
+      flex-direction: column;
+    }
+
+    .login-container {
+      display: flex;
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* Banner/Left Side */
+    .banner {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-      overflow-x: hidden;
-    }
-
-    .card {
-      background-color: white;
-      border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 450px;
+      color: white;
+      padding: 40px;
+      position: relative;
       overflow: hidden;
-      transform: translateY(0);
-      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    .banner-content {
+      max-width: 500px;
+      text-align: center;
+      z-index: 10;
     }
 
-    .card-header {
-      padding: 30px 30px 20px;
-      border-bottom: 1px solid var(--border-color);
-      position: relative;
-    }
-
-    .card-header:before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 5px;
-      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    }
-
-    .card-body {
-      padding: 30px;
-    }
-
-    .logo {
-      font-size: 26px;
+    .banner h1 {
+      font-size: 2.5rem;
       font-weight: 700;
-      color: var(--primary-color);
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      animation: fadeIn 0.8s ease-in-out;
+      margin-bottom: 1rem;
+      line-height: 1.2;
     }
 
-    .logo i {
-      margin-right: 12px;
-      font-size: 30px;
+    .banner p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
     }
 
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 25px;
-      position: relative;
+    .logo-large {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: white;
+      display: inline-block;
+      height: 80px;
+      width: 80px;
+      line-height: 80px;
+      text-align: center;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
-    .tab {
-      padding: 12px 20px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #7a8599;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .tab:hover {
-      color: var(--primary-color);
-    }
-
-    .tab.active {
-      color: var(--primary-color);
-    }
-
-    .tab-indicator {
+    .banner-bg {
       position: absolute;
-      bottom: -1px;
-      height: 3px;
-      background-color: var(--primary-color);
-      transition: all 0.3s ease;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0.1;
+      background-image:
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+    }
+
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border-radius: 50%;
+    }
+
+    .shape-1 {
+      width: 300px;
+      height: 300px;
+      bottom: -150px;
+      left: -50px;
+    }
+
+    .shape-2 {
+      width: 200px;
+      height: 200px;
+      top: -50px;
+      right: -50px;
+    }
+
+    /* Form/Right Side */
+    .form-container {
+      width: 550px;
+      background-color: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem;
+      overflow-y: auto;
+    }
+
+    .form-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .form-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .form-subtitle {
+      color: var(--text-medium);
+      font-size: 1rem;
     }
 
     .form-group {
-      margin-bottom: 22px;
-      position: relative;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideUp 0.5s forwards;
-    }
-
-    .form-group:nth-child(2) {
-      animation-delay: 0.1s;
-    }
-
-    .form-group:nth-child(3) {
-      animation-delay: 0.2s;
+      margin-bottom: 1.5rem;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 8px;
+      font-size: 0.95rem;
       font-weight: 600;
-      font-size: 14px;
-      color: #4a5568;
-      transition: all 0.3s ease;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
     }
 
     .input-group {
@@ -152,26 +181,27 @@
     .input-icon {
       position: absolute;
       top: 50%;
-      left: 15px;
+      left: 1rem;
       transform: translateY(-50%);
-      color: #a0aec0;
-      transition: all 0.3s ease;
+      color: var(--text-light);
+      transition: color 0.2s;
     }
 
     .form-control {
       width: 100%;
-      padding: 14px 15px 14px 45px;
+      padding: 0.85rem 1rem 0.85rem 2.75rem;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 15px;
-      transition: all 0.3s ease;
-      background-color: #fff;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      color: var(--text-dark);
+      background-color: var(--white);
     }
 
     .form-control:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      box-shadow: 0 0 0 3px rgba(58, 89, 202, 0.1);
     }
 
     .form-control:focus + .input-icon {
@@ -181,11 +211,11 @@
     .toggle-password {
       position: absolute;
       top: 50%;
-      right: 15px;
+      right: 1rem;
       transform: translateY(-50%);
       cursor: pointer;
-      color: #a0aec0;
-      transition: all 0.3s ease;
+      color: var(--text-light);
+      transition: color 0.2s;
     }
 
     .toggle-password:hover {
@@ -193,138 +223,286 @@
     }
 
     .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
       background-color: var(--primary-color);
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideUp 0.5s forwards 0.3s;
+      box-shadow: var(--shadow-sm);
+      width: 100%;
     }
 
-    .btn:hover {
-      background-color: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
     }
 
-    .btn:active {
+    .btn-primary:active:not(:disabled) {
       transform: translateY(0);
-      box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
     }
 
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300%;
-      height: 300%;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.6s;
-    }
-
-    .btn:hover::before {
-      transform: translate(-50%, -50%) scale(1);
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
     .btn i {
-      margin-right: 8px;
+      margin-right: 0.5rem;
     }
 
-    .tab-content {
-      display: none;
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
     }
 
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.5s;
-    }
-
-    .message {
-      padding: 14px;
-      border-radius: 8px;
-      margin-bottom: 22px;
-      font-size: 14px;
-      display: none;
-      opacity: 0;
-      transform: translateY(-10px);
-      animation: slideDown 0.4s forwards;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .message.error {
-      background-color: rgba(231, 76, 60, 0.1);
-      color: var(--error-color);
-      border: 1px solid rgba(231, 76, 60, 0.2);
+    .form-check {
       display: flex;
       align-items: center;
     }
 
-    .message.success {
-      background-color: rgba(46, 204, 113, 0.1);
-      color: var(--success-color);
-      border: 1px solid rgba(46, 204, 113, 0.2);
-      display: flex;
-      align-items: center;
+    .form-check-input {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+      accent-color: var(--primary-color);
     }
 
-    .message i {
-      margin-right: 10px;
-      font-size: 16px;
+    .form-check-label {
+      font-size: 0.9rem;
+      color: var(--text-medium);
     }
 
-    .footer {
-      text-align: center;
-      margin-top: 25px;
-      font-size: 13px;
-      color: #7a8599;
-      opacity: 0;
-      animation: fadeIn 0.8s forwards 0.5s;
-    }
-
-    .reset-password-link {
-      display: block;
-      text-align: right;
-      margin-top: 10px;
+    .forgot-password {
+      font-size: 0.9rem;
       color: var(--primary-color);
-      font-size: 14px;
       text-decoration: none;
-      transition: all 0.3s;
-      opacity: 0;
-      animation: fadeIn 0.8s forwards 0.4s;
+      font-weight: 500;
+      transition: color 0.2s;
     }
 
-    .reset-password-link:hover {
-      color: var(--primary-hover);
-      transform: translateX(3px);
+    .forgot-password:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
     }
 
-    /* Animaciones */
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background-color: var(--border-color);
+    }
+
+    .divider-text {
+      padding: 0 1rem;
+      color: var(--text-medium);
+      font-size: 0.9rem;
+    }
+
+    .social-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      background-color: var(--white);
+      border: 1px solid var(--border-color);
+      color: var(--text-dark);
+      font-size: 1.25rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .google-btn:hover {
+      color: var(--google-color);
+      border-color: var(--google-color);
+    }
+
+    .github-btn:hover {
+      color: var(--github-color);
+      border-color: var(--github-color);
+    }
+
+    .microsoft-btn:hover {
+      color: var(--microsoft-color);
+      border-color: var(--microsoft-color);
+    }
+
+    .create-account {
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--text-medium);
+      margin-top: 1.5rem;
+    }
+
+    .create-account a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .create-account a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* Captcha Styles */
+    .captcha-container {
+      background-color: var(--bg-color);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .captcha-challenge {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      padding: 0.5rem;
+      text-align: center;
+      letter-spacing: 1px;
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(45deg, #f7fafc 25%, #fff 25%, #fff 50%, #f7fafc 50%, #f7fafc 75%, #fff 75%, #fff 100%);
+      background-size: 8px 8px;
+      border-radius: 0.5rem;
+      user-select: none;
+    }
+
+    .captcha-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      margin-top: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .captcha-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(58, 89, 202, 0.1);
+    }
+
+    .captcha-refresh {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: var(--white);
+      border: 1px solid var(--border-color);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-medium);
+    }
+
+    .captcha-refresh:hover {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .captcha-status {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .captcha-status.valid {
+      color: var(--success-color);
+    }
+
+    .captcha-status.invalid {
+      color: var(--error-color);
+    }
+
+    .captcha-status i {
+      margin-right: 0.35rem;
+    }
+
+    /* Alert Messages */
+    .alert {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      display: none;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .alert i {
+      margin-right: 0.75rem;
+      font-size: 1rem;
+      margin-top: 0.1rem;
+    }
+
+    .alert-error {
+      background-color: rgba(229, 62, 62, 0.08);
+      color: var(--error-color);
+      border: 1px solid rgba(229, 62, 62, 0.15);
+    }
+
+    .alert-success {
+      background-color: rgba(56, 161, 105, 0.08);
+      color: var(--success-color);
+      border: 1px solid rgba(56, 161, 105, 0.15);
+    }
+
+    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     @keyframes shake {
@@ -337,106 +515,141 @@
       animation: shake 0.5s ease-in-out;
     }
 
-    /* Estilos responsivos */
-    @media (max-width: 500px) {
-      .card {
-        border-radius: 12px;
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .login-container {
+        flex-direction: column;
       }
-      .card-header {
-        padding: 25px 20px 15px;
+
+      .banner {
+        display: none;
       }
-      .card-body {
-        padding: 20px;
+
+      .form-container {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
       }
-      .form-control {
-        padding: 12px 15px 12px 40px;
+
+      .social-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .form-container {
+        padding: 2rem 1.5rem;
+      }
+
+      .form-header {
+        margin-bottom: 2rem;
+      }
+
+      .form-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .social-buttons {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <div class="card-header">
-      <div class="logo">
-        <i class="fas fa-user-shield"></i> Sistema de Usuarios
+  <div class="login-container">
+    <!-- Left Side Banner -->
+    <div class="banner">
+      <div class="banner-bg"></div>
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+
+      <div class="banner-content">
+        <div class="logo-large">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h1>Sistema de Usuarios</h1>
+        <p>Plataforma de gestión centralizada con autenticación segura y controles de acceso avanzados.</p>
       </div>
     </div>
 
-    <div class="card-body">
-      <div class="tabs">
-        <div class="tab active" data-tab="login">Iniciar Sesión</div>
-        <div class="tab-indicator"></div>
+    <!-- Right Side Form -->
+    <div class="form-container">
+      <div class="form-header">
+        <h2 class="form-title">Bienvenido de nuevo</h2>
+        <p class="form-subtitle">Inicia sesión para acceder a tu cuenta</p>
       </div>
 
-      <div id="message" class="message"></div>
+      <div id="message" class="alert"></div>
 
-      <div id="loginTab" class="tab-content active">
-        <form id="loginForm" action="/login" method="POST">
-          <div class="form-group">
-            <label for="username">Nombre de Usuario</label>
-            <div class="input-group">
-              <i class="input-icon fas fa-user"></i>
-              <input type="text" id="username" class="form-control" name="username" placeholder="Ingrese su nombre de usuario" required autocomplete="username">
-            </div>
+      <!-- Social Login Buttons -->
+      <div class="social-buttons">
+        <a href="/auth/google" class="social-btn google-btn">
+          <i class="fab fa-google"></i>
+        </a>
+        <a href="/auth/github" class="social-btn github-btn">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="/auth/microsoft" class="social-btn microsoft-btn">
+          <i class="fab fa-microsoft"></i>
+        </a>
+      </div>
+
+      <div class="divider">
+        <span class="divider-text">o continúa con</span>
+      </div>
+
+      <form id="loginForm" action="/login" method="POST">
+        <div class="form-group">
+          <label for="username">Nombre de Usuario</label>
+          <div class="input-group">
+            <input type="text" id="username" class="form-control" name="username" placeholder="Ingrese su nombre de usuario" required autocomplete="username">
+            <i class="input-icon fas fa-user"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="input-group">
+            <input type="password" id="password" class="form-control" name="password" placeholder="Ingrese su contraseña" required autocomplete="current-password">
+            <i class="input-icon fas fa-lock"></i>
+            <i class="toggle-password fas fa-eye"></i>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <div class="form-check">
+            <input type="checkbox" id="remember-me" class="form-check-input">
+            <label for="remember-me" class="form-check-label">Recordarme</label>
           </div>
 
-          <div class="form-group">
-            <label for="password">Contraseña</label>
-            <div class="input-group">
-              <i class="input-icon fas fa-lock"></i>
-              <input type="password" id="password" class="form-control" name="password" placeholder="Ingrese su contraseña" required autocomplete="current-password">
-              <i class="toggle-password fas fa-eye"></i>
-            </div>
-          </div>
+          <a href="/reset-password" class="forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
 
-          <a href="#" id="resetPasswordLink" class="reset-password-link">
-            <i class="fas fa-key fa-sm"></i> ¿Olvidaste tu contraseña?
-          </a>
-
-          <button type="submit" class="btn">
-            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        <!-- Captcha Component -->
+        <div class="captcha-container">
+          <div class="captcha-challenge" id="captcha-challenge"></div>
+          <button type="button" class="captcha-refresh" id="captcha-refresh" title="Generar nuevo captcha">
+            <i class="fas fa-sync-alt"></i>
           </button>
-        </form>
-      </div>
+          <input type="text" id="captcha-input" class="captcha-input" placeholder="Ingrese el resultado" required>
+          <div class="captcha-status" id="captcha-status"></div>
+        </div>
 
-      <div class="footer">
-        © 2025 Sistema de Usuarios. Todos los derechos reservados.
+        <button type="submit" class="btn btn-primary" id="submit-btn" disabled>
+          <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="create-account">
+        ¿No tienes una cuenta? <a href="/register">Crear cuenta</a>
       </div>
     </div>
   </div>
 
   <script>
-    // Set up tab functionality
-    const tabs = document.querySelectorAll('.tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const tabIndicator = document.querySelector('.tab-indicator');
-
-    function updateTabIndicator(activeTab) {
-      tabIndicator.style.width = `${activeTab.offsetWidth}px`;
-      tabIndicator.style.left = `${activeTab.offsetLeft}px`;
-    }
-
-    function showTab(tabName) {
-      tabs.forEach(tab => tab.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-
-      const activeTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
-      activeTab.classList.add('active');
-      document.getElementById(`${tabName}Tab`).classList.add('active');
-
-      updateTabIndicator(activeTab);
-    }
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        showTab(tab.dataset.tab);
-      });
-    });
-
-    // Initialize tab indicator
-    updateTabIndicator(document.querySelector('.tab.active'));
-
     // Toggle password visibility with animation
     const togglePassword = document.querySelector('.toggle-password');
     const passwordInput = document.getElementById('password');
@@ -446,50 +659,153 @@
       passwordInput.setAttribute('type', type);
 
       // Animate the icon change
-      this.style.transform = 'translateY(-50%) scale(0)';
-
-      setTimeout(() => {
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-        this.style.transform = 'translateY(-50%) scale(1)';
-      }, 150);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
     });
 
     // Display messages with animation
     function showMessage(type, content) {
       const messageElement = document.getElementById('message');
-      messageElement.className = `message ${type}`;
+      messageElement.className = `alert alert-${type}`;
 
       const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
-      messageElement.innerHTML = `<i class="fas ${icon}"></i> ${content}`;
+      messageElement.innerHTML = `<i class="fas ${icon}"></i> <span>${content}</span>`;
       messageElement.style.display = 'flex';
-      messageElement.style.opacity = '0';
-      messageElement.style.transform = 'translateY(-10px)';
 
-      // Trigger reflow
-      void messageElement.offsetWidth;
-
-      // Apply animation
-      messageElement.style.animation = 'slideDown 0.4s forwards';
+      // Add animation
+      messageElement.style.animation = 'slideDown 0.4s var(--ease-out)';
 
       // Scroll to top of form to show the message
       messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Check for error parameter in URL
+    // Check for URL parameters
     const urlParams = new URLSearchParams(window.location.search);
+
+    // Error handling
     const error = urlParams.get('error');
     if (error) {
       showMessage('error', decodeURIComponent(error));
     }
 
-    // Add reset password link functionality
-    document.getElementById('resetPasswordLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      window.location.href = '/reset-password';
+    // Success handling
+    const success = urlParams.get('success');
+    if (success) {
+      showMessage('success', decodeURIComponent(success));
+    }
+
+    // OAuth error handling
+    const oauth_error = urlParams.get('oauth_error');
+    if (oauth_error) {
+      showMessage('error', `Error de autenticación: ${decodeURIComponent(oauth_error)}`);
+    }
+
+    // OAuth success handling
+    const oauth_success = urlParams.get('oauth_success');
+    if (oauth_success) {
+      showMessage('success', `Autenticación exitosa: ${decodeURIComponent(oauth_success)}`);
+    }
+
+    // CAPTCHA FUNCTIONALITY
+    const captchaChallenge = document.getElementById('captcha-challenge');
+    const captchaInput = document.getElementById('captcha-input');
+    const captchaRefresh = document.getElementById('captcha-refresh');
+    const captchaStatus = document.getElementById('captcha-status');
+    const submitBtn = document.getElementById('submit-btn');
+
+    let captchaCorrectAnswer = 0;
+    let captchaValid = false;
+
+    // Generate a random math captcha
+    function generateCaptcha() {
+      // Clear previous status
+      captchaStatus.innerHTML = '';
+      captchaStatus.className = 'captcha-status';
+      captchaInput.value = '';
+
+      // Generate random numbers and operation
+      const num1 = Math.floor(Math.random() * 20) + 1;
+      const num2 = Math.floor(Math.random() * 10) + 1;
+
+      const operations = ['+', '-', '×'];
+      const operationIndex = Math.floor(Math.random() * 3);
+      const operation = operations[operationIndex];
+
+      // Calculate the correct answer
+      switch(operation) {
+        case '+':
+          captchaCorrectAnswer = num1 + num2;
+          break;
+        case '-':
+          captchaCorrectAnswer = num1 - num2;
+          break;
+        case '×':
+          captchaCorrectAnswer = num1 * num2;
+          break;
+      }
+
+      // Display the math challenge
+      captchaChallenge.textContent = `${num1} ${operation} ${num2} = ?`;
+
+      // Reset captcha valid state
+      captchaValid = false;
+      updateSubmitButton();
+    }
+
+    // Validate the captcha
+    function validateCaptcha() {
+      const userAnswer = parseInt(captchaInput.value.trim(), 10);
+
+      if(isNaN(userAnswer)) {
+        captchaStatus.innerHTML = '<i class="fas fa-times-circle"></i> Por favor ingrese un número';
+        captchaStatus.className = 'captcha-status invalid';
+        captchaValid = false;
+      } else if(userAnswer === captchaCorrectAnswer) {
+        captchaStatus.innerHTML = '<i class="fas fa-check-circle"></i> Correcto';
+        captchaStatus.className = 'captcha-status valid';
+        captchaValid = true;
+      } else {
+        captchaStatus.innerHTML = '<i class="fas fa-times-circle"></i> Incorrecto, intente de nuevo';
+        captchaStatus.className = 'captcha-status invalid';
+        captchaValid = false;
+      }
+
+      updateSubmitButton();
+    }
+
+    // Update submit button state
+    function updateSubmitButton() {
+      const usernameValue = document.getElementById('username').value.trim();
+      const passwordValue = document.getElementById('password').value.trim();
+
+      submitBtn.disabled = !(usernameValue && passwordValue && captchaValid);
+    }
+
+    // Initialize captcha
+    generateCaptcha();
+
+    // Refresh captcha on click
+    captchaRefresh.addEventListener('click', function() {
+      generateCaptcha();
+
+      // Add rotation animation
+      this.style.transition = 'transform 0.5s ease';
+      this.style.transform = 'rotate(360deg)';
+
+      setTimeout(() => {
+        this.style.transition = 'none';
+        this.style.transform = 'rotate(0deg)';
+      }, 500);
     });
 
-    // Add form validation with visual feedback
+    // Validate captcha on input
+    captchaInput.addEventListener('input', validateCaptcha);
+
+    // Monitor fields to update submit button
+    document.getElementById('username').addEventListener('input', updateSubmitButton);
+    document.getElementById('password').addEventListener('input', updateSubmitButton);
+
+    // Form validation
     const form = document.getElementById('loginForm');
 
     form.addEventListener('submit', async function(e) {
@@ -512,8 +828,14 @@
         isValid = false;
       }
 
+      if (!captchaValid) {
+        captchaInput.classList.add('shake');
+        setTimeout(() => captchaInput.classList.remove('shake'), 500);
+        isValid = false;
+      }
+
       if (!isValid) {
-        showMessage('error', 'Por favor complete todos los campos');
+        showMessage('error', 'Por favor complete todos los campos correctamente');
         return;
       }
 
@@ -538,17 +860,14 @@
 
         // Reset button state
         submitButton.innerHTML = originalText;
-        submitButton.disabled = false;
+        submitButton.disabled = !captchaValid;
 
         if (response.ok) {
           const result = await response.json();
           if (result.success) {
             showMessage('success', result.message);
 
-            // Add subtle redirection animation
-            document.querySelector('.card').style.opacity = '0';
-            document.querySelector('.card').style.transform = 'translateY(-20px)';
-
+            // Add redirect animation
             setTimeout(() => {
               window.location.href = result.redirectTo;
             }, 800);
@@ -557,25 +876,29 @@
           const errorText = await response.text();
           showMessage('error', errorText);
 
-          // Add subtle shake animation on error
+          // Add shake animation
           form.classList.add('shake');
           setTimeout(() => form.classList.remove('shake'), 500);
+
+          // Regenerate captcha on failed login
+          generateCaptcha();
         }
       } catch (err) {
+        submitBtn.disabled = !captchaValid;
         showMessage('error', 'Error al conectar con el servidor. Por favor intente más tarde.');
       }
     });
 
-    // Add input animations
-    const inputs = document.querySelectorAll('.form-control');
+    // Social Button Effects
+    const socialButtons = document.querySelectorAll('.social-btn');
 
-    inputs.forEach(input => {
-      input.addEventListener('focus', function() {
-        this.parentElement.parentElement.querySelector('label').style.color = 'var(--primary-color)';
-      });
-
-      input.addEventListener('blur', function() {
-        this.parentElement.parentElement.querySelector('label').style.color = '';
+    socialButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        // Show subtle animation before redirecting
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
       });
     });
   </script>

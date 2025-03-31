@@ -6,9 +6,13 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const session = require('express-session');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
+const MicrosoftStrategy = require('passport-microsoft').Strategy;
 
 // Cargar variables de entorno
 dotenv.config();
@@ -31,32 +35,8 @@ const accessLogStream = fs.createWriteStream(
 
 // Conexión a MongoDB
 const mongoUri = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:27017/dataBaseSegDev?authSource=admin`;
-const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
 let db;
-client.connect()
-  .then(async () => {
-    db = client.db('dataBaseSegDev');
-    console.log('Conectado a MongoDB');
-
-    // Verificar si existe el usuario admin, si no, crearlo
-    const adminExists = await db.collection('users').findOne({ username: 'admin' });
-    if (!adminExists) {
-      const hashedPassword = crypto.createHash('sha256').update('admin123').digest('hex');
-      await db.collection('users').insertOne({
-        username: 'admin',
-        email: 'admin@example.com', // Asegúrate de que el admin tenga email
-        password: hashedPassword,
-        role: 'admin',
-        failedAttempts: 0,
-        lastFailedAttempt: null
-      });
-      console.log('Usuario admin creado');
-    }
-  })
-  .catch(err => {
-    console.error('Error al conectar a MongoDB:', err);
-  });
+const client = new MongoClient(mongoUri);
 
 // Middleware de registro personalizado
 const customLogger = (req, res, next) => {
@@ -91,13 +71,13 @@ const customLogger = (req, res, next) => {
   next();
 };
 
-// Configuración de middleware
+// Configuración de middleware básico
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuración del middleware de sesión
+// Configuración del middleware de sesión (IMPORTANTE: antes de passport)
 app.use(session({
   secret: process.env.NODE_SECRET || 'secret-key-dev',
   resave: false,
@@ -109,12 +89,95 @@ app.use(session({
   },
 }));
 
+// Configuración de Passport (DESPUÉS de express-session)
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Registrar el middleware de logging personalizado
 app.use(customLogger);
 
-// Middleware para verificar si el usuario puede intentar iniciar sesión después de 3 intentos fallidos
+// Configuración de Passport para serialización/deserialización
+passport.serializeUser((user, done) => {
+  done(null, user._id.toString());
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    let objectId;
+    try {
+      objectId = new ObjectId(id);
+    } catch (err) {
+      objectId = id;
+    }
+
+    const user = await db.collection('users').findOne({ _id: objectId });
+    done(null, user);
+  } catch (err) {
+    console.error("Error deserializando usuario:", err);
+    done(err, null);
+  }
+});
+
+// Función para procesar el resultado de autenticación OAuth
+async function handleOAuthLogin(profile, provider, done) {
+  try {
+    console.log(`Procesando login de ${provider} para perfil:`, JSON.stringify(profile, null, 2));
+
+    // Extraer email del perfil
+    const email = profile.emails && profile.emails.length > 0
+      ? profile.emails[0].value
+      : null;
+
+    // Construir consulta para buscar usuario existente
+    const query = { $or: [{ [`${provider}Id`]: profile.id }] };
+    if (email) {
+      query.$or.push({ email });
+    }
+
+    console.log("Buscando usuario con query:", JSON.stringify(query));
+
+    // Buscar si el usuario ya existe
+    let user = await db.collection('users').findOne(query);
+
+    if (user) {
+      console.log(`Usuario encontrado:`, user);
+      // Si el usuario existe pero no tiene ID del proveedor, actualizar
+      if (!user[`${provider}Id`]) {
+        await db.collection('users').updateOne(
+          { _id: user._id },
+          { $set: { [`${provider}Id`]: profile.id } }
+        );
+      }
+      return done(null, user);
+    }
+
+    // Si el usuario no existe, crearlo
+    console.log(`Creando nuevo usuario con ${provider}`);
+    const newUser = {
+      username: profile.displayName || profile.username || `${provider}-user-${profile.id}`,
+      email: email,
+      [`${provider}Id`]: profile.id,
+      role: 'operador', // Rol por defecto para usuarios OAuth
+      createdAt: new Date(),
+      failedAttempts: 0,
+      lastFailedAttempt: null
+    };
+
+    const result = await db.collection('users').insertOne(newUser);
+    newUser._id = result.insertedId;
+    console.log(`Usuario creado con ID: ${newUser._id}`);
+
+    return done(null, newUser);
+  } catch (err) {
+    console.error(`Error en autenticación ${provider}:`, err);
+    return done(err, null);
+  }
+}
+
+// Middleware para verificar si el usuario puede intentar iniciar sesión
 const checkLoginAttempts = async (username) => {
   const user = await db.collection('users').findOne({ username });
-  if (!user) return true; // Si el usuario no existe, permitir el intento (la autenticación fallará de todos modos)
+  if (!user) return true; // Si el usuario no existe, permitir el intento
 
   if (user.failedAttempts >= 3) {
     // Si han pasado menos de 5 minutos desde el último intento fallido, bloquear
@@ -132,6 +195,98 @@ const checkLoginAttempts = async (username) => {
 
   return true;
 };
+
+// Conexión a MongoDB e inicialización del servidor
+async function startServer() {
+  try {
+    await client.connect();
+    db = client.db('dataBaseSegDev');
+    console.log('Conectado a MongoDB');
+
+    // Verificar si existe el usuario admin, si no, crearlo
+    const adminExists = await db.collection('users').findOne({ username: 'admin' });
+    if (!adminExists) {
+      const hashedPassword = crypto.createHash('sha256').update('admin123').digest('hex');
+      await db.collection('users').insertOne({
+        username: 'admin',
+        email: 'admin@example.com',
+        password: hashedPassword,
+        role: 'admin',
+        failedAttempts: 0,
+        lastFailedAttempt: null
+      });
+      console.log('Usuario admin creado');
+    }
+
+    // Configurar estrategias OAuth solo si las variables de entorno están definidas
+    configureOAuthStrategies();
+
+    // Iniciar el servidor HTTP
+    const server = http.createServer(app);
+    server.listen(PORT, () => {
+      console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error('Error al iniciar el servidor:', err);
+    process.exit(1);
+  }
+}
+
+// Configuración de estrategias OAuth
+function configureOAuthStrategies() {
+  // Google OAuth (solo si están definidas las credenciales)
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${process.env.NGROK_URL || `http://localhost:${PORT}`}/auth/google/callback`,
+      scope: ['profile', 'email']
+    }, (accessToken, refreshToken, profile, done) => {
+      handleOAuthLogin(profile, 'google', done);
+    }));
+
+    console.log("Estrategia de Google OAuth configurada");
+  } else {
+    console.log("Estrategia de Google OAuth no configurada: faltan credenciales");
+  }
+
+  // GitHub OAuth (solo si están definidas las credenciales)
+  if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    passport.use(new GitHubStrategy({
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: `${process.env.NGROK_URL || `http://localhost:${PORT}`}/auth/github/callback`,
+      scope: ['user:email']
+    }, (accessToken, refreshToken, profile, done) => {
+      handleOAuthLogin(profile, 'github', done);
+    }));
+
+    console.log("Estrategia de GitHub OAuth configurada");
+  } else {
+    console.log("Estrategia de GitHub OAuth no configurada: faltan credenciales");
+  }
+
+  // Microsoft OAuth (solo si están definidas las credenciales)
+  if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
+    passport.use(new MicrosoftStrategy({
+      clientID: process.env.MICROSOFT_CLIENT_ID,
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+      callbackURL: `${process.env.NGROK_URL || `http://localhost:${PORT}`}/auth/microsoft/callback`,
+      scope: ['user.read']
+    }, (accessToken, refreshToken, profile, done) => {
+      handleOAuthLogin(profile, 'microsoft', done);
+    }));
+
+    console.log("Estrategia de Microsoft OAuth configurada");
+  } else {
+    console.log("Estrategia de Microsoft OAuth no configurada: faltan credenciales");
+  }
+}
+
+//=========================================================
+// RUTAS DE LA APLICACIÓN
+//=========================================================
 
 // Ruta raíz - sirve la página de inicio de sesión
 app.get('/', (req, res) => {
@@ -483,7 +638,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Ruta para obtener la información del usuario actual
+// Ruta para obtener información del usuario actual
 app.get('/api/user-info', async (req, res) => {
   if (!req.session || !req.session.authenticated) {
     return res.status(401).json({ error: 'No autenticado' });
@@ -520,28 +675,19 @@ app.get('/users', async (req, res) => {
   }
 
   try {
-    // Obtener todos los usuarios con los campos necesarios
+    // Obtener todos los usuarios excluyendo solo el campo password
     const users = await db.collection('users').find({}, {
       projection: {
-        username: 1,
-        email: 1,
-        role: 1,
-        failedAttempts: 1,
-        lastFailedAttempt: 1
+        password: 0 // Solo excluimos la contraseña
       }
     }).toArray();
 
     // Asegurarse de que todos los usuarios tengan valores por defecto para los campos que podrían ser null
     const processedUsers = users.map(user => ({
       ...user,
-      // Configurar defaultAttempts a 0 si es null/undefined
       failedAttempts: user.failedAttempts || 0,
-      // Mantener lastFailedAttempt como null si no existe para que la interfaz lo maneje
       email: user.email || 'No disponible'
     }));
-
-    // Registrar lo que estamos enviando para debug
-    console.log("Enviando usuarios al cliente:", JSON.stringify(processedUsers, null, 2));
 
     res.json(processedUsers);
   } catch (err) {
@@ -550,6 +696,99 @@ app.get('/users', async (req, res) => {
   }
 });
 
+//=========================================================
+// RUTAS DE AUTENTICACIÓN OAUTH
+//=========================================================
+
+// Ruta para mostrar estado de autenticación (útil para depuración)
+app.get('/auth/status', (req, res) => {
+  res.json({
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user ? {
+      username: req.user.username,
+      email: req.user.email,
+      role: req.user.role
+    } : null,
+    session: {
+      authenticated: req.session?.authenticated,
+      username: req.session?.username,
+      role: req.session?.role
+    }
+  });
+});
+
+// Rutas para autenticación de Google (solo si está configurada)
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+  app.get('/auth/google/callback',
+    passport.authenticate('google', {
+      failureRedirect: '/?oauth_error=Google+authentication+failed',
+      failureMessage: true
+    }),
+    (req, res) => {
+      // Establecer los valores de la sesión
+      req.session.username = req.user.username;
+      req.session.role = req.user.role;
+      req.session.authenticated = true;
+
+      // Redirigir según el rol del usuario
+      if (req.user.role === 'admin') {
+        res.redirect('/admin');
+      } else {
+        res.redirect('/user');
+      }
+    }
+  );
+}
+
+// Rutas para autenticación de GitHub (solo si está configurada)
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+  app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+  app.get('/auth/github/callback',
+    passport.authenticate('github', {
+      failureRedirect: '/?oauth_error=GitHub+authentication+failed',
+      failureMessage: true
+    }),
+    (req, res) => {
+      // Establecer los valores de la sesión
+      req.session.username = req.user.username;
+      req.session.role = req.user.role;
+      req.session.authenticated = true;
+
+      // Redirigir según el rol del usuario
+      if (req.user.role === 'admin') {
+        res.redirect('/admin');
+      } else {
+        res.redirect('/user');
+      }
+    }
+  );
+}
+
+// Rutas para autenticación de Microsoft (solo si está configurada)
+if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
+  app.get('/auth/microsoft', passport.authenticate('microsoft', { scope: ['user.read'] }));
+  app.get('/auth/microsoft/callback',
+    passport.authenticate('microsoft', {
+      failureRedirect: '/?oauth_error=Microsoft+authentication+failed',
+      failureMessage: true
+    }),
+    (req, res) => {
+      // Establecer los valores de la sesión
+      req.session.username = req.user.username;
+      req.session.role = req.user.role;
+      req.session.authenticated = true;
+
+      // Redirigir según el rol del usuario
+      if (req.user.role === 'admin') {
+        res.redirect('/admin');
+      } else {
+        res.redirect('/user');
+      }
+    }
+  );
+}
+
 // Middleware de manejo de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -557,7 +796,4 @@ app.use((err, req, res, next) => {
 });
 
 // Iniciar el servidor
-const server = http.createServer(app);
-server.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
-});
+startServer();
