@@ -1,1 +1,1434 @@
-hola usuario :3
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Usuario</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --primary-dark: #2980b9;
+      --secondary-color: #2ecc71;
+      --secondary-dark: #27ae60;
+      --accent-color: #9b59b6;
+      --text-color: #333;
+      --text-light: #7a8599;
+      --light-gray: #f5f7fa;
+      --dark-gray: #34495e;
+      --border-color: #dbe0e6;
+      --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      color: var(--text-color);
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Barra superior */
+    .top-bar {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      padding: 15px 25px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 10px;
+      font-size: 24px;
+    }
+
+    .user-section {
+      display: flex;
+      align-items: center;
+    }
+
+    .clock-date {
+      text-align: right;
+      margin-right: 20px;
+      line-height: 1.2;
+    }
+
+    .clock {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .date {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      background-color: var(--light-gray);
+      padding: 8px 15px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .user-info:hover {
+      background-color: #e9ecef;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      margin-right: 10px;
+    }
+
+    .user-info i {
+      color: var(--text-light);
+    }
+
+    /* Contenido principal */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    /* Tarjetas */
+    .card {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark-gray);
+      display: flex;
+      align-items: center;
+    }
+
+    .card-title i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+
+    /* Tarjeta de bienvenida */
+    .welcome-card {
+      grid-column: span 8;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-card::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .welcome-card .card-title {
+      color: white;
+      font-size: 24px;
+    }
+
+    .welcome-card .card-title i {
+      color: white;
+    }
+
+    .welcome-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .welcome-text {
+      flex: 2;
+    }
+
+    .welcome-text h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .welcome-text p {
+      opacity: 0.9;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .welcome-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .btn-white {
+      background-color: white;
+      color: var(--primary-color);
+    }
+
+    .btn-white:hover {
+      background-color: #f1f1f1;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-outline:hover {
+      border-color: white;
+      transform: translateY(-2px);
+    }
+
+    .welcome-image {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-image img {
+      max-width: 100%;
+      max-height: 180px;
+    }
+
+    /* Tarjeta del clima */
+    .weather-card {
+      grid-column: span 4;
+      text-align: center;
+    }
+
+    .weather-icon {
+      font-size: 60px;
+      margin: 10px 0;
+      color: var(--primary-color);
+    }
+
+    .weather-temp {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .weather-desc {
+      color: var(--text-light);
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .weather-details {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    .weather-detail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .weather-detail i {
+      font-size: 20px;
+      color: var(--accent-color);
+      margin-bottom: 8px;
+    }
+
+    .weather-detail span {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .weather-detail strong {
+      font-size: 16px;
+      color: var(--text-color);
+    }
+
+    /* Tarjeta de estadísticas */
+    .stats-card {
+      grid-column: span 4;
+    }
+
+    .stat-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .stat-item {
+      flex: 1;
+      background-color: var(--light-gray);
+      border-radius: 12px;
+      padding: 15px;
+      min-width: calc(50% - 8px);
+    }
+
+    .stat-title {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--dark-gray);
+    }
+
+    .stat-icon {
+      float: right;
+      background-color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-color);
+    }
+
+    /* Tarjeta de tareas */
+    .tasks-card {
+      grid-column: span 8;
+    }
+
+    .tasks-list {
+      list-style: none;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-check {
+      margin-right: 15px;
+      cursor: pointer;
+    }
+
+    .task-check input[type="checkbox"] {
+      display: none;
+    }
+
+    .custom-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .task-check input[type="checkbox"]:checked + .custom-checkbox {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+    }
+
+    .custom-checkbox i {
+      color: white;
+      font-size: 14px;
+      display: none;
+    }
+
+    .task-check input[type="checkbox"]:checked + .custom-checkbox i {
+      display: block;
+    }
+
+    .task-content {
+      flex: 1;
+    }
+
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+      transition: var(--transition);
+    }
+
+    .task-check input[type="checkbox"]:checked ~ .task-content .task-title {
+      color: var(--text-light);
+      text-decoration: line-through;
+    }
+
+    .task-date {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .task-badge {
+      padding: 5px 10px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .badge-high {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+    }
+
+    .badge-medium {
+      background-color: rgba(243, 156, 18, 0.1);
+      color: #f39c12;
+    }
+
+    .badge-low {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .task-actions {
+      margin-left: 10px;
+    }
+
+    .task-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+
+    .task-actions button:hover {
+      color: var(--primary-color);
+    }
+
+    /* Tarjeta del calendario */
+    .calendar-card {
+      grid-column: span 4;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .calendar-month {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark-gray);
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .calendar-nav button {
+      background: var(--light-gray);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .calendar-nav button:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .calendar-weekdays span {
+      font-size: 13px;
+      color: var(--text-light);
+      padding: 5px;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-day {
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .calendar-day:hover {
+      background-color: var(--light-gray);
+    }
+
+    .calendar-day.today {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+    }
+
+    .calendar-day.has-event::after {
+      content: "";
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+    }
+
+    .calendar-day.other-month {
+      color: #ccc;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      padding: 20px;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    /* Menú de usuario */
+    .user-menu {
+      position: absolute;
+      top: 65px;
+      right: 20px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: var(--card-shadow);
+      width: 240px;
+      padding: 15px;
+      display: none;
+      z-index: 100;
+    }
+
+    .user-menu.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .user-menu-header {
+      text-align: center;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 15px;
+    }
+
+    .user-menu-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0 auto 10px;
+    }
+
+    .user-menu-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .user-menu-email {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .user-menu-list {
+      list-style: none;
+    }
+
+    .user-menu-item {
+      margin-bottom: 10px;
+    }
+
+    .user-menu-item a {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .user-menu-item a:hover {
+      background-color: var(--light-gray);
+    }
+
+    .user-menu-item i {
+      width: 30px;
+      color: var(--primary-color);
+    }
+
+    .logout-item a {
+      color: #e74c3c;
+    }
+
+    .logout-item i {
+      color: #e74c3c;
+    }
+
+    /* Estados de carga */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    .loading i {
+      margin-right: 8px;
+      animation: spin 1s linear infinite;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0, #f8f8f8, #f0f0f0);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .skeleton-text {
+      height: 16px;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .skeleton-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+    }
+
+    /* Notificación de error */
+    .error-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #fff;
+      border-left: 4px solid #e74c3c;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      max-width: 350px;
+      z-index: 1000;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .error-notification.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .error-notification i {
+      color: #e74c3c;
+      font-size: 20px;
+      margin-right: 15px;
+    }
+
+    .error-notification-content {
+      flex: 1;
+    }
+
+    .error-notification-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .error-notification-message {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes loading {
+      0% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .welcome-card {
+        grid-column: span 12;
+      }
+      .weather-card {
+        grid-column: span 6;
+      }
+      .stats-card {
+        grid-column: span 6;
+      }
+      .tasks-card {
+        grid-column: span 8;
+      }
+      .calendar-card {
+        grid-column: span 4;
+      }
+    }
+
+    @media (max-width: 991px) {
+      .welcome-image {
+        display: none;
+      }
+      .tasks-card, .calendar-card {
+        grid-column: span 12;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .weather-card, .stats-card {
+        grid-column: span 12;
+      }
+      .top-bar {
+        flex-direction: column;
+        align-items: start;
+      }
+      .user-section {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 15px;
+      }
+      .welcome-text h2 {
+        font-size: 24px;
+      }
+      .welcome-text p {
+        font-size: 14px;
+      }
+      .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .clock-date {
+        display: none;
+      }
+      .welcome-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .stat-item {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Barra superior -->
+    <div class="top-bar">
+      <div class="logo">
+        <i class="fas fa-user-shield"></i> Panel de Usuario
+      </div>
+      <div class="user-section">
+        <div class="clock-date">
+          <div class="clock" id="clock">Cargando...</div>
+          <div class="date" id="date">Cargando...</div>
+        </div>
+        <div class="user-info" id="user-info-toggle">
+          <div class="user-avatar" id="user-avatar">
+            <div class="skeleton skeleton-circle"></div>
+          </div>
+          <div class="user-name" id="username">
+            <div class="skeleton skeleton-text" style="width: 80px;"></div>
+          </div>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menú de usuario -->
+    <div class="user-menu" id="user-menu">
+      <div class="user-menu-header">
+        <div class="user-menu-avatar" id="menu-avatar">
+          <div class="skeleton skeleton-circle"></div>
+        </div>
+        <div class="user-menu-name" id="menu-username">
+          <div class="skeleton skeleton-text" style="width: 120px;"></div>
+        </div>
+        <div class="user-menu-email" id="user-email">
+          <div class="skeleton skeleton-text" style="width: 150px;"></div>
+        </div>
+      </div>
+      <ul class="user-menu-list">
+        <li class="user-menu-item">
+          <a href="#">
+            <i class="fas fa-user"></i>
+            Mi Perfil
+          </a>
+        </li>
+        <li class="user-menu-item">
+          <a href="#">
+            <i class="fas fa-cog"></i>
+            Configuración
+          </a>
+        </li>
+        <li class="user-menu-item">
+          <a href="#">
+            <i class="fas fa-bell"></i>
+            Notificaciones
+          </a>
+        </li>
+        <li class="user-menu-item logout-item">
+          <a href="/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Cerrar Sesión
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Notificación de error -->
+    <div class="error-notification" id="error-notification">
+      <i class="fas fa-exclamation-circle"></i>
+      <div class="error-notification-content">
+        <div class="error-notification-title">Error</div>
+        <div class="error-notification-message" id="error-message">Ha ocurrido un problema al cargar los datos.</div>
+      </div>
+    </div>
+
+    <!-- Dashboard principal -->
+    <div class="dashboard">
+      <!-- Tarjeta de bienvenida -->
+      <div class="card welcome-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-home"></i> Panel Principal
+          </h3>
+        </div>
+        <div class="welcome-content">
+          <div class="welcome-text">
+            <h2>¡Bienvenido, <span id="welcome-username">
+              <div class="skeleton skeleton-text" style="width: 100px; display: inline-block;"></div>
+            </span>!</h2>
+            <p>
+              Gracias por iniciar sesión en nuestro sistema. Aquí podrás encontrar toda la información que necesitas para gestionar tus actividades.
+            </p>
+            <div class="welcome-buttons">
+              <a href="#" class="btn btn-white">
+                <i class="fas fa-book"></i> Documentación
+              </a>
+              <a href="#" class="btn btn-outline">
+                <i class="fas fa-chart-pie"></i> Ver Informes
+              </a>
+            </div>
+          </div>
+          <div class="welcome-image">
+            <img src="https://cdn-icons-png.flaticon.com/512/6840/6840478.png" alt="Dashboard Illustration">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta del clima -->
+      <div class="card weather-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-cloud-sun"></i> Clima
+          </h3>
+          <span id="weather-location">Cargando...</span>
+        </div>
+        <div id="weather-icon" class="weather-icon">
+          <i class="fas fa-sun"></i>
+        </div>
+        <div id="weather-temp" class="weather-temp">--°C</div>
+        <div id="weather-desc" class="weather-desc">Cargando información...</div>
+        <div class="weather-details">
+          <div class="weather-detail">
+            <i class="fas fa-wind"></i>
+            <span>Viento</span>
+            <strong id="weather-wind">-- km/h</strong>
+          </div>
+          <div class="weather-detail">
+            <i class="fas fa-tint"></i>
+            <span>Humedad</span>
+            <strong id="weather-humidity">--%</strong>
+          </div>
+          <div class="weather-detail">
+            <i class="fas fa-eye"></i>
+            <span>Visibilidad</span>
+            <strong id="weather-visibility">-- km</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de estadísticas -->
+      <div class="card stats-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-chart-bar"></i> Estadísticas
+          </h3>
+        </div>
+        <div class="stat-items">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-title">Tiempo de Sesión</div>
+            <div class="stat-value" id="session-time">0m</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-title">Tareas Completadas</div>
+            <div class="stat-value">3/8</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="stat-title">Mensajes</div>
+            <div class="stat-value">5</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-title">Documentos</div>
+            <div class="stat-value">12</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de tareas -->
+      <div class="card tasks-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-tasks"></i> Mis Tareas
+          </h3>
+        </div>
+        <ul class="tasks-list">
+          <li class="task-item">
+            <label class="task-check">
+              <input type="checkbox" checked>
+              <div class="custom-checkbox">
+                <i class="fas fa-check"></i>
+              </div>
+            </label>
+            <div class="task-content">
+              <div class="task-title">Completar reporte semanal</div>
+              <div class="task-date">Hoy, 09:00 AM</div>
+            </div>
+            <span class="task-badge badge-high">Urgente</span>
+            <div class="task-actions">
+              <button type="button">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </li>
+          <li class="task-item">
+            <label class="task-check">
+              <input type="checkbox">
+              <div class="custom-checkbox">
+                <i class="fas fa-check"></i>
+              </div>
+            </label>
+            <div class="task-content">
+              <div class="task-title">Revisar documentación de seguridad</div>
+              <div class="task-date">Mañana, 10:30 AM</div>
+            </div>
+            <span class="task-badge badge-medium">Media</span>
+            <div class="task-actions">
+              <button type="button">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </li>
+          <li class="task-item">
+            <label class="task-check">
+              <input type="checkbox">
+              <div class="custom-checkbox">
+                <i class="fas fa-check"></i>
+              </div>
+            </label>
+            <div class="task-content">
+              <div class="task-title">Actualizar información de perfil</div>
+              <div class="task-date">Ayer, 02:15 PM</div>
+            </div>
+            <span class="task-badge badge-low">Baja</span>
+            <div class="task-actions">
+              <button type="button">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </li>
+          <li class="task-item">
+            <label class="task-check">
+              <input type="checkbox" checked>
+              <div class="custom-checkbox">
+                <i class="fas fa-check"></i>
+              </div>
+            </label>
+            <div class="task-content">
+              <div class="task-title">Participar en reunión de equipo</div>
+              <div class="task-date">Ayer, 11:00 AM</div>
+            </div>
+            <span class="task-badge badge-medium">Media</span>
+            <div class="task-actions">
+              <button type="button">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Tarjeta del calendario -->
+      <div class="card calendar-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-calendar-alt"></i> Calendario
+          </h3>
+        </div>
+        <div class="calendar-header">
+          <div class="calendar-month" id="calendar-month">Marzo 2025</div>
+          <div class="calendar-nav">
+            <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+            <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Dom</span>
+          <span>Lun</span>
+          <span>Mar</span>
+          <span>Mié</span>
+          <span>Jue</span>
+          <span>Vie</span>
+          <span>Sáb</span>
+        </div>
+        <div class="calendar-days" id="calendar-days">
+          <!-- Los días del calendario se generarán con JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      &copy; 2025 Sistema de Usuarios. Todos los derechos reservados.
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inicializar la página
+      updateClock();
+      setInterval(updateClock, 1000);
+      generateCalendar();
+      getWeather();
+      startSessionTimer();
+      fetchUserInfo();
+
+      // Toggle del menú de usuario
+      document.getElementById('user-info-toggle').addEventListener('click', function() {
+        document.getElementById('user-menu').classList.toggle('active');
+      });
+
+      // Cerrar menú al hacer clic fuera
+      document.addEventListener('click', function(event) {
+        const userInfo = document.getElementById('user-info-toggle');
+        const userMenu = document.getElementById('user-menu');
+
+        if (!userInfo.contains(event.target) && !userMenu.contains(event.target)) {
+          userMenu.classList.remove('active');
+        }
+      });
+
+      // Navegación del calendario
+      document.getElementById('prev-month').addEventListener('click', function() {
+        const [month, year] = document.getElementById('calendar-month').textContent.split(' ');
+        const date = new Date(`${month} 1, ${year}`);
+        date.setMonth(date.getMonth() - 1);
+        generateCalendar(date);
+      });
+
+      document.getElementById('next-month').addEventListener('click', function() {
+        const [month, year] = document.getElementById('calendar-month').textContent.split(' ');
+        const date = new Date(`${month} 1, ${year}`);
+        date.setMonth(date.getMonth() + 1);
+        generateCalendar(date);
+      });
+    });
+
+    // Función para obtener información del usuario desde el servidor
+    async function fetchUserInfo() {
+      try {
+        const response = await fetch('/api/user-info');
+
+        if (!response.ok) {
+          throw new Error('No se pudo cargar la información del usuario');
+        }
+
+        const userData = await response.json();
+
+        // Actualizar la interfaz con los datos del usuario
+        const username = userData.username;
+        const email = userData.email;
+        const role = userData.role;
+
+        // Actualizar los elementos de la interfaz
+        document.getElementById('username').textContent = username;
+        document.getElementById('menu-username').textContent = username;
+        document.getElementById('welcome-username').textContent = username;
+        document.getElementById('user-email').textContent = email;
+
+        // Generar iniciales para el avatar
+        const initials = username.charAt(0).toUpperCase();
+        document.getElementById('user-avatar').textContent = initials;
+        document.getElementById('menu-avatar').textContent = initials;
+
+        // También podemos guardar en sessionStorage para uso futuro
+        sessionStorage.setItem('username', username);
+        sessionStorage.setItem('email', email);
+        sessionStorage.setItem('userRole', role);
+
+      } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+
+        // Si hay un error, usar valores por defecto/fallback
+        const username = sessionStorage.getItem('username') || 'Usuario';
+        const email = sessionStorage.getItem('email') || 'correo@ejemplo.com';
+
+        document.getElementById('username').textContent = username;
+        document.getElementById('menu-username').textContent = username;
+        document.getElementById('welcome-username').textContent = username;
+        document.getElementById('user-email').textContent = email;
+
+        const initials = username.charAt(0).toUpperCase();
+        document.getElementById('user-avatar').textContent = initials;
+        document.getElementById('menu-avatar').textContent = initials;
+
+        // Mostrar notificación de error
+        showError('No se pudo cargar la información del usuario. Se están utilizando datos por defecto.');
+      }
+    }
+
+    // Función para mostrar un error
+    function showError(message) {
+      const notification = document.getElementById('error-notification');
+      document.getElementById('error-message').textContent = message;
+
+      notification.classList.add('show');
+
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 5000);
+    }
+
+    // Función para actualizar reloj y fecha
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+      let hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+
+      hours = hours % 12;
+      hours = hours ? hours : 12; // 0 debe ser 12 en formato AM/PM
+
+      document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+      document.getElementById('date').textContent = now.toLocaleDateString('es-ES', options);
+    }
+
+    // Función para generar calendario
+    function generateCalendar(date = new Date()) {
+      const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+      const year = date.getFullYear();
+      const month = date.getMonth();
+
+      document.getElementById('calendar-month').textContent = `${monthNames[month]} ${year}`;
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+
+      const daysInMonth = lastDay.getDate();
+      const startingDay = firstDay.getDay(); // 0 = Domingo, 6 = Sábado
+
+      const calendarDays = document.getElementById('calendar-days');
+      calendarDays.innerHTML = '';
+
+      // Días del mes anterior
+      const prevMonthLastDay = new Date(year, month, 0).getDate();
+      for (let i = startingDay - 1; i >= 0; i--) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day other-month';
+        dayElement.textContent = prevMonthLastDay - i;
+        calendarDays.appendChild(dayElement);
+      }
+
+      // Días del mes actual
+      const today = new Date();
+      const currentDay = today.getDate();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      // Eventos de ejemplo
+      const events = {
+        5: true,
+        12: true,
+        18: true,
+        22: true
+      };
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = i;
+
+        // Marcar día actual
+        if (i === currentDay && month === currentMonth && year === currentYear) {
+          dayElement.classList.add('today');
+        }
+
+        // Marcar días con eventos
+        if (events[i]) {
+          dayElement.classList.add('has-event');
+        }
+
+        calendarDays.appendChild(dayElement);
+      }
+
+      // Calcular cuántos días del siguiente mes mostrar
+      const totalDaysShown = Math.ceil((daysInMonth + startingDay) / 7) * 7;
+      const nextMonthDays = totalDaysShown - (daysInMonth + startingDay);
+
+      // Días del mes siguiente
+      for (let i = 1; i <= nextMonthDays; i++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day other-month';
+        dayElement.textContent = i;
+        calendarDays.appendChild(dayElement);
+      }
+    }
+
+    // Función para obtener datos del clima
+    function getWeather() {
+      // En un entorno real, usaríamos una API como OpenWeatherMap
+      // Por ahora, simulamos los datos
+
+      // Determinar ubicación aproximada basada en la IP
+      fetch('https://ipapi.co/json/')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('No se pudo obtener la ubicación');
+          }
+          return response.json();
+        })
+        .then(locationData => {
+          // Simulación de datos del clima basados en la ubicación real
+          const weatherData = {
+            location: locationData.city || 'Tu ubicación',
+            temp: Math.floor(Math.random() * 15) + 15, // Entre 15 y 30°C
+            description: ['Soleado', 'Parcialmente nublado', 'Nublado', 'Lluvioso'][Math.floor(Math.random() * 4)],
+            wind: Math.floor(Math.random() * 20) + 5,
+            humidity: Math.floor(Math.random() * 40) + 40,
+            visibility: Math.floor(Math.random() * 10) + 5
+          };
+
+          // Establecer el icono según la descripción
+          let icon = 'cloud-sun';
+          switch (weatherData.description) {
+            case 'Soleado':
+              icon = 'sun';
+              break;
+            case 'Parcialmente nublado':
+              icon = 'cloud-sun';
+              break;
+            case 'Nublado':
+              icon = 'cloud';
+              break;
+            case 'Lluvioso':
+              icon = 'cloud-rain';
+              break;
+          }
+          weatherData.icon = icon;
+
+          // Actualizar la interfaz
+          document.getElementById('weather-location').textContent = weatherData.location;
+          document.getElementById('weather-temp').textContent = `${weatherData.temp}°C`;
+          document.getElementById('weather-desc').textContent = weatherData.description;
+          document.getElementById('weather-icon').innerHTML = `<i class="fas fa-${weatherData.icon}"></i>`;
+          document.getElementById('weather-wind').textContent = `${weatherData.wind} km/h`;
+          document.getElementById('weather-humidity').textContent = `${weatherData.humidity}%`;
+          document.getElementById('weather-visibility').textContent = `${weatherData.visibility} km`;
+        })
+        .catch(error => {
+          console.error('Error al obtener el clima:', error);
+
+          // Valores por defecto en caso de error
+          const weatherData = {
+            location: 'No disponible',
+            temp: 23,
+            description: 'Información no disponible',
+            icon: 'question',
+            wind: '--',
+            humidity: '--',
+            visibility: '--'
+          };
+
+          document.getElementById('weather-location').textContent = weatherData.location;
+          document.getElementById('weather-temp').textContent = `${weatherData.temp}°C`;
+          document.getElementById('weather-desc').textContent = weatherData.description;
+          document.getElementById('weather-icon').innerHTML = `<i class="fas fa-${weatherData.icon}"></i>`;
+          document.getElementById('weather-wind').textContent = `${weatherData.wind} km/h`;
+          document.getElementById('weather-humidity').textContent = `${weatherData.humidity}%`;
+          document.getElementById('weather-visibility').textContent = `${weatherData.visibility} km`;
+        });
+    }
+
+    // Función para iniciar contador de tiempo de sesión
+    function startSessionTimer() {
+      const startTime = Date.now();
+
+      setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const hours = Math.floor(minutes / 60);
+
+        if (hours > 0) {
+          document.getElementById('session-time').textContent = `${hours}h ${minutes % 60}m`;
+        } else {
+          document.getElementById('session-time').textContent = `${minutes}m`;
+        }
+      }, 60000); // Actualizar cada minuto
+    }
+  </script>
+</body>
+</html>

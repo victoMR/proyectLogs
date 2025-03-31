@@ -71,6 +71,7 @@
       transition: all 0.3s;
       display: flex;
       align-items: center;
+      text-decoration: none;
     }
     .logout-btn:hover {
       background-color: #f1f1f1;
@@ -153,6 +154,28 @@
     .role-operador {
       background-color: rgba(46, 204, 113, 0.1);
       color: var(--operador-color);
+    }
+    .role-pepe, .role-pepito {
+      background-color: rgba(52, 152, 219, 0.1);
+      color: var(--primary-color);
+    }
+    .attempts-badge {
+      padding: 4px 8px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .attempts-zero {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: var(--success-color);
+    }
+    .attempts-warning {
+      background-color: rgba(243, 156, 18, 0.1);
+      color: var(--supervisor-color);
+    }
+    .attempts-danger {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: var(--error-color);
     }
     .modal {
       display: none;
@@ -279,6 +302,26 @@
       cursor: pointer;
       color: #a0aec0;
     }
+    .refresh-btn {
+      margin-left: 10px;
+      background-color: var(--light-gray);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .refresh-btn:hover {
+      background-color: #e9ecef;
+    }
+    .refresh-btn i {
+      color: var(--text-color);
+      margin: 0;
+    }
     @keyframes modalAnimation {
       from {
         opacity: 0;
@@ -288,6 +331,17 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .rotating {
+      animation: rotate 1s linear infinite;
     }
     @media (max-width: 768px) {
       .header {
@@ -327,9 +381,14 @@
 
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">
-          <i class="fas fa-users"></i> Gestión de Usuarios
-        </h2>
+        <div style="display: flex; align-items: center;">
+          <h2 class="card-title">
+            <i class="fas fa-users"></i> Gestión de Usuarios
+          </h2>
+          <button id="refreshBtn" class="refresh-btn" title="Actualizar lista">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
         <button id="addUserBtn" class="btn btn-primary">
           <i class="fas fa-user-plus"></i> Nuevo Usuario
         </button>
@@ -339,6 +398,7 @@
           <thead>
             <tr>
               <th>Usuario</th>
+              <th>Correo</th>
               <th>Rol</th>
               <th>Intentos Fallidos</th>
               <th>Último Intento</th>
@@ -369,6 +429,12 @@
             <input type="text" id="newUsername" class="form-control" required>
           </div>
           <div class="form-group">
+            <label for="newEmail">Correo Electrónico</label>
+            <div class="input-group">
+              <input type="email" id="newEmail" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group">
             <label for="newPassword">Contraseña</label>
             <div class="input-group">
               <input type="password" id="newPassword" class="form-control" required>
@@ -387,8 +453,8 @@
             <select id="userRole" class="form-select" required>
               <option value="">Seleccione un rol</option>
               <option value="admin">Administrador</option>
-              <option value="pepe">Pepe</option>
-              <option value="pepito">Pepito</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="operador">Operador</option>
             </select>
           </div>
         </form>
@@ -415,6 +481,16 @@
       // Event listeners para el modal
       document.getElementById('addUserBtn').addEventListener('click', function() {
         openModal('addUserModal');
+      });
+
+      document.getElementById('refreshBtn').addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        icon.classList.add('rotating');
+        loadUsers().then(() => {
+          setTimeout(() => {
+            icon.classList.remove('rotating');
+          }, 1000);
+        });
       });
 
       document.querySelectorAll('.close-modal').forEach(function(button) {
@@ -460,6 +536,7 @@
         const response = await fetch('/users');
         if (response.ok) {
           const users = await response.json();
+          console.log("Usuarios cargados:", users); // Debug: ver los datos del servidor
           displayUsers(users);
         } else {
           showMessage('error', 'Error al cargar usuarios: ' + (await response.text()));
@@ -476,12 +553,17 @@
 
       users.forEach(user => {
         const tr = document.createElement('tr');
-        
+
         // Columna de nombre de usuario
         const tdUsername = document.createElement('td');
         tdUsername.textContent = user.username;
         tr.appendChild(tdUsername);
-        
+
+        // Columna de correo electrónico
+        const tdEmail = document.createElement('td');
+        tdEmail.textContent = user.email || 'No disponible';
+        tr.appendChild(tdEmail);
+
         // Columna de rol
         const tdRole = document.createElement('td');
         const roleSpan = document.createElement('span');
@@ -489,22 +571,39 @@
         roleSpan.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
         tdRole.appendChild(roleSpan);
         tr.appendChild(tdRole);
-        
+
         // Columna de intentos fallidos
         const tdFailedAttempts = document.createElement('td');
-        tdFailedAttempts.textContent = user.failedAttempts || 0;
+        // Si failedAttempts es null/undefined, mostrar 0
+        const failedAttempts = user.failedAttempts !== undefined ? user.failedAttempts : 0;
+
+        // Crear badge con color según la cantidad de intentos
+        const attemptsBadge = document.createElement('span');
+        attemptsBadge.className = 'attempts-badge';
+
+        if (failedAttempts === 0) {
+          attemptsBadge.classList.add('attempts-zero');
+        } else if (failedAttempts < 3) {
+          attemptsBadge.classList.add('attempts-warning');
+        } else {
+          attemptsBadge.classList.add('attempts-danger');
+        }
+
+        attemptsBadge.textContent = failedAttempts;
+        tdFailedAttempts.appendChild(attemptsBadge);
         tr.appendChild(tdFailedAttempts);
-        
+
         // Columna de último intento fallido
         const tdLastAttempt = document.createElement('td');
         if (user.lastFailedAttempt) {
+          // Convertir timestamp a fecha legible
           const date = new Date(user.lastFailedAttempt);
           tdLastAttempt.textContent = date.toLocaleString();
         } else {
           tdLastAttempt.textContent = 'N/A';
         }
         tr.appendChild(tdLastAttempt);
-        
+
         tableBody.appendChild(tr);
       });
     }
@@ -526,26 +625,41 @@
 
     // Función para mostrar mensajes
     function showMessage(type, content, isModal = false) {
-      const messageElement = isModal ? 
-        document.getElementById('modalMessage') : 
+      const messageElement = isModal ?
+        document.getElementById('modalMessage') :
         document.getElementById('message');
-      
+
       messageElement.className = `message ${type}`;
       const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
       messageElement.innerHTML = `<i class="fas ${icon}"></i> ${content}`;
       messageElement.style.display = 'flex';
+
+      if (!isModal) {
+        // Auto-ocultar mensaje principal después de 5 segundos
+        setTimeout(() => {
+          messageElement.style.display = 'none';
+        }, 5000);
+      }
     }
 
     // Función para registrar un nuevo usuario
     async function saveUser() {
       const username = document.getElementById('newUsername').value;
+      const email = document.getElementById('newEmail').value;
       const password = document.getElementById('newPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
       const role = document.getElementById('userRole').value;
 
       // Validar campos
-      if (!username || !password || !confirmPassword || !role) {
+      if (!username || !email || !password || !confirmPassword || !role) {
         showMessage('error', 'Todos los campos son obligatorios', true);
+        return;
+      }
+
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showMessage('error', 'Por favor, introduce un correo electrónico válido', true);
         return;
       }
 
@@ -555,6 +669,11 @@
       }
 
       try {
+        const saveBtn = document.getElementById('saveUserBtn');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        saveBtn.disabled = true;
+
         const response = await fetch('/register', {
           method: 'POST',
           headers: {
@@ -562,10 +681,14 @@
           },
           body: JSON.stringify({
             username,
+            email,
             password,
             role
           })
         });
+
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
 
         if (response.ok) {
           // Mostrar mensaje de éxito
@@ -575,9 +698,12 @@
           // Recargar lista de usuarios
           loadUsers();
         } else {
-          showMessage('error', await response.text(), true);
+          const errorText = await response.text();
+          showMessage('error', errorText, true);
         }
       } catch (err) {
+        document.getElementById('saveUserBtn').innerHTML = '<i class="fas fa-save"></i> Guardar';
+        document.getElementById('saveUserBtn').disabled = false;
         showMessage('error', 'Error de conexión: ' + err.message, true);
       }
     }

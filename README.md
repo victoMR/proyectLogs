@@ -1,19 +1,55 @@
-# MongoDB en Google Cloud con Terraform
+# Sistema de Gestión de Usuarios con MongoDB en Google Cloud
 
-Este proyecto despliega un clúster de MongoDB en Google Cloud utilizando **Terraform**. Incluye la configuración de instancias de Compute Engine, la instalación de MongoDB, y la habilitación de **sharding** y **balancing**.
+Este proyecto implementa un **sistema de gestión de usuarios** conectado a una base de datos MongoDB hospedada en Google Cloud. Incluye un servidor Express.js completo con autenticación, restablecimiento de contraseñas, paneles de administración y usuario personalizados, todo configurado con seguridad avanzada.
+
+![Node.js](https://img.shields.io/badge/Node.js-v14+-green.svg)
+![Express](https://img.shields.io/badge/Express-v4.18+-blue.svg)
+![MongoDB](https://img.shields.io/badge/MongoDB-v5+-yellow.svg)
+![Google Cloud](https://img.shields.io/badge/Google_Cloud-Certified-red.svg)
 
 ---
 
 ## **Tabla de contenidos**
 
-1. [Requisitos](#requisitos)
-2. [Configuración inicial](#configuración-inicial)
-3. [Desplegar la infraestructura con Terraform](#desplegar-la-infraestructura-con-terraform)
-4. [Configurar MongoDB](#configurar-mongodb)
-5. [Habilitar Sharding y Balancing](#habilitar-sharding-y-balancing)
-6. [Próximos pasos](#próximos-pasos)
-7. [Contribuir](#contribuir)
-8. [Licencia](#licencia)
+1. [Características](#características)
+2. [Requisitos](#requisitos)
+3. [Configuración inicial](#configuración-inicial)
+4. [Estructura del proyecto](#estructura-del-proyecto)
+5. [Despliegue de MongoDB en Google Cloud](#despliegue-de-mongodb-en-google-cloud)
+6. [Configuración del servidor Express](#configuración-del-servidor-express)
+7. [Características avanzadas](#características-avanzadas)
+8. [API Endpoints](#api-endpoints)
+9. [Próximos pasos](#próximos-pasos)
+10. [Contribuir](#contribuir)
+11. [Licencia](#licencia)
+
+---
+
+## **Características**
+
+### Sistema de autenticación
+- Inicio de sesión seguro con hash de contraseñas
+- Bloqueo automático después de 3 intentos fallidos (5 minutos)
+- Sesiones persistentes con Express-session
+- Niveles de acceso por rol (admin, supervisor, operador)
+
+### Gestión de cuentas
+- Restablecimiento de contraseña mediante correo electrónico
+- Verificación con códigos temporales de 6 caracteres
+- Interfaz intuitiva de tres pasos para restablecer contraseña
+- Sistema de validación de seguridad para nuevas contraseñas
+
+### Paneles de usuario
+- Panel de Administración con gestión completa de usuarios
+- Panel de Usuario con widgets personalizados (clima, tareas, calendario)
+- Visualización de datos en tiempo real (sesión, fecha/hora)
+- Diseño responsivo para todos los dispositivos
+
+### Seguridad
+- Protección contra inyección de SQL
+- Registro detallado de actividades (login, intentos fallidos)
+- Manejo seguro de headers y cookies
+- Protección CSRF implementada
 
 ---
 
@@ -21,10 +57,11 @@ Este proyecto despliega un clúster de MongoDB en Google Cloud utilizando **Terr
 
 Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
-1. **Terraform**: [Instalación de Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli).
-2. **Google Cloud SDK**: [Instalación de Google Cloud SDK](https://cloud.google.com/sdk/docs/install).
-3. **Cuenta de Google Cloud**: Con un proyecto habilitado y facturación activa.
-4. **Claves de servicio**: Un archivo JSON de credenciales de Google Cloud.
+1. **Node.js (v14+)** y **npm**: [Instalación de Node.js](https://nodejs.org/).
+2. **MongoDB**: Local o en la nube.
+3. **Terraform**: [Instalación de Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) (solo si despliegas en Google Cloud).
+4. **Google Cloud SDK**: [Instalación de Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (opcional).
+5. **Editor de código**: VS Code, Sublime Text, etc.
 
 ---
 
@@ -36,19 +73,55 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
    cd proyectLogs
    ```
 
-2. **Configura las credenciales de Google Cloud**:
-   - Descarga el archivo JSON de credenciales desde Google Cloud Console.
-   - Coloca el archivo en la raíz del proyecto y renómbralo a `credentials.json`.
+2. **Instala las dependencias**:
+   ```bash
+   npm install
+   ```
 
-3. **Configura las variables de Terraform**:
-   - Edita el archivo `variables.tf` para personalizar la configuración (por ejemplo, región, zona, tipo de máquina, etc.).
+3. **Configura las variables de entorno**:
+   - Crea un archivo `.env` en la raíz del proyecto:
+   ```
+   MONGO_HOST=localhost
+   MONGO_USER=admin
+   MONGO_PASSWORD=tu_contraseña
+   NODE_SECRET=tu_secreto_para_sesiones
+   NODE_EMAIL=tu_correo@ejemplo.com
+   NODE_PASSWORD=tu_contraseña_email
+   PORT=3001
+   ```
+
+4. **Inicia el servidor**:
+   ```bash
+   npm start
+   ```
 
 ---
 
-## **Desplegar la infraestructura con Terraform**
+## **Estructura del proyecto**
+
+```
+proyecto/
+├── logs/                  # Archivos de registro de actividad
+├── public/                # Archivos estáticos
+│   ├── index.html        # Página de inicio de sesión
+│   ├── admin.html        # Panel de administración
+│   ├── users.html        # Panel de usuario
+│   └── reset-password.html # Página de recuperación de contraseña
+├── server.js              # Archivo principal del servidor
+├── package.json           # Dependencias del proyecto
+├── terraform/             # Archivos de configuración de Terraform
+└── .env                   # Variables de entorno (no incluido en el repositorio)
+```
+
+---
+
+## **Despliegue de MongoDB en Google Cloud**
+
+### Utilizando Terraform
 
 1. **Inicializa Terraform**:
    ```bash
+   cd terraform
    terraform init
    ```
 
@@ -62,107 +135,156 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
    terraform apply
    ```
 
-   Esto creará las instancias de Compute Engine en Google Cloud y configurará la red.
+### Configurar MongoDB para el proyecto
+
+1. **Habilitar el acceso remoto**:
+   ```yaml
+   # /etc/mongod.conf
+   net:
+     bindIp: 0.0.0.0
+     port: 27017
+   ```
+
+2. **Crear la base de datos y colecciones**:
+   ```javascript
+   use dataBaseSegDev;
+   db.createCollection("users");
+
+   // Crear usuario administrador inicial
+   db.users.insertOne({
+     username: "admin",
+     email: "admin@example.com",
+     password: "hashed_password", // Usar crypto para generar el hash
+     role: "admin",
+     failedAttempts: 0,
+     lastFailedAttempt: null
+   });
+   ```
 
 ---
 
-## **Configurar MongoDB**
+## **Configuración del servidor Express**
 
-1. **Conéctate a las instancias**:
-   - Usa SSH para conectarte a cada instancia creada por Terraform:
-     ```bash
-     gcloud compute ssh <NOMBRE_INSTANCIA> --zone=<ZONA>
-     ```
+El servidor implementa las siguientes características:
 
-2. **Instala MongoDB**:
-   - En cada instancia, ejecuta:
-     ```bash
-     sudo apt update
-     sudo apt install -y mongodb-org
-     sudo systemctl start mongod
-     sudo systemctl enable mongod
-     ```
+### Middleware principal
+```javascript
+// Configuración de middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-3. **Configura MongoDB para conexiones remotas**:
-   - Edita el archivo `/etc/mongod.conf`:
-     ```yaml
-     net:
-       bindIp: 0.0.0.0
-       port: 27017
-     ```
+// Configuración del middleware de sesión
+app.use(session({
+  secret: process.env.NODE_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  },
+}));
+```
 
-   - Reinicia MongoDB:
-     ```bash
-     sudo systemctl restart mongod
-     ```
+### Sistema de registro (Logs)
+```javascript
+// Flujo de escritura para logs
+const accessLogStream = fs.createWriteStream(
+  path.join(logsDir, 'access.log'),
+  { flags: 'a' }
+);
 
----
+// Middleware de registro personalizado
+app.use(customLogger);
+```
 
-## **Habilitar Sharding y Balancing**
-
-1. **Configura los Config Servers**:
-   - Crea un replica set para los config servers:
-     ```javascript
-     rs.initiate({
-       _id: "configReplSet",
-       configsvr: true,
-       members: [
-         { _id: 0, host: "<IP_CONFIG1>:27019" },
-         { _id: 1, host: "<IP_CONFIG2>:27019" },
-         { _id: 2, host: "<IP_CONFIG3>:27019" }
-       ]
-     });
-     ```
-
-2. **Configura los Shards**:
-   - Crea un replica set para cada shard:
-     ```javascript
-     rs.initiate({
-       _id: "shardReplSet",
-       members: [
-         { _id: 0, host: "<IP_SHARD1>:27018" },
-         { _id: 1, host: "<IP_SHARD2>:27018" },
-         { _id: 2, host: "<IP_SHARD3>:27018" }
-       ]
-     });
-     ```
-
-3. **Configura el Mongos**:
-   - Edita el archivo `/etc/mongod.conf`:
-     ```yaml
-     net:
-       bindIp: 0.0.0.0
-       port: 27017
-     sharding:
-       configDB: configReplSet/<IP_CONFIG1>:27019,<IP_CONFIG2>:27019,<IP_CONFIG3>:27019
-     ```
-
-4. **Habilita el sharding**:
-   - Conéctate al mongos y habilita el sharding:
-     ```javascript
-     sh.enableSharding("dataBaseSegDev");
-     sh.shardCollection("dataBaseSegDev.users", { username: 1 });
-     ```
-
-5. **Habilita el balancer**:
-   - Verifica y habilita el balancer:
-     ```javascript
-     sh.getBalancerState();
-     sh.setBalancerState(true);
-     ```
+### Autenticación de usuarios
+```javascript
+app.post('/login', async (req, res) => {
+  // Verificar credenciales
+  // Controlar intentos fallidos
+  // Establecer sesión
+});
+```
 
 ---
 
-## **Próximos pasos**
+## **Características avanzadas**
 
-1. **Monitorear el clúster**:
-   - Usa herramientas como **MongoDB Atlas** o **Prometheus** para monitorear el rendimiento.
+### Sistema de restablecimiento de contraseña
 
-2. **Optimizar el sharding**:
-   - Ajusta la clave de sharding para mejorar el rendimiento.
+Hemos implementado un flujo de tres pasos para restablecimiento de contraseñas:
 
-3. **Escalar el clúster**:
-   - Agrega más shards o instancias según sea necesario.
+1. **Solicitud de restablecimiento**:
+   - El usuario ingresa su correo electrónico
+   - Se genera un código único de 6 caracteres
+   - Se envía un correo con el código
+
+2. **Verificación del código**:
+   - El usuario ingresa el código recibido
+   - El sistema verifica el código contra la base de datos
+   - El código tiene una validez de 3 minutos
+
+3. **Establecimiento de nueva contraseña**:
+   - El usuario establece una nueva contraseña segura
+   - Se actualiza la contraseña en la base de datos
+   - Se reinician los intentos fallidos
+
+### Endpoint de información del usuario
+
+Añadimos un nuevo endpoint para obtener datos del usuario autenticado:
+
+```javascript
+app.get('/api/user-info', async (req, res) => {
+  if (!req.session || !req.session.authenticated) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+
+  try {
+    const username = req.session.username;
+    const user = await db.collection('users').findOne(
+      { username },
+      { projection: { password: 0 } }
+    );
+
+    res.json({
+      username: user.username,
+      email: user.email || 'correo no disponible',
+      role: user.role
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+```
+
+### Panel de usuario interactivo
+
+El panel de usuario incluye:
+
+- **Información personalizada** del usuario (nombre, correo)
+- **Widget de clima** basado en la ubicación geográfica
+- **Calendario interactivo** con navegación entre meses
+- **Sistema de tareas** con marcado de completadas
+- **Estadísticas en tiempo real** (tiempo de sesión, etc.)
+
+---
+
+## **API Endpoints**
+
+| Endpoint | Método | Descripción | Autenticación |
+|----------|--------|-------------|---------------|
+| `/login` | POST | Iniciar sesión | No |
+| `/logout` | GET | Cerrar sesión | Sí |
+| `/register` | POST | Registrar nuevo usuario | Sí (admin) |
+| `/users` | GET | Obtener lista de usuarios | Sí (admin) |
+| `/request-password-reset` | POST | Solicitar restablecimiento | No |
+| `/check-verification-code` | POST | Verificar código | No |
+| `/verify-reset-password` | POST | Actualizar contraseña | No |
+| `/api/user-info` | GET | Obtener info del usuario | Sí |
+
 
 ---
 
@@ -184,19 +306,6 @@ Este proyecto está bajo la licencia [MIT](LICENSE).
 
 ---
 
+## **Gracias**
+
 ¡Gracias por usar este proyecto! Si tienes preguntas o sugerencias, no dudes en abrir un issue en el repositorio. 😊
-
----
-
-### **Estructura del repositorio**
-
-```
-mongodb-google-cloud-terraform/
-├── main.tf
-├── variables.tf
-├── outputs.tf
-├── credentials.json
-├── README.md
-└── LICENSE
-```
-
