@@ -19,9 +19,8 @@ Este proyecto implementa un **sistema de gestión de usuarios** conectado a una 
 6. [Configuración del servidor Express](#configuración-del-servidor-express)
 7. [Características avanzadas](#características-avanzadas)
 8. [API Endpoints](#api-endpoints)
-9. [Próximos pasos](#próximos-pasos)
-10. [Contribuir](#contribuir)
-11. [Licencia](#licencia)
+9. [Contribuir](#contribuir)
+10. [Licencia](#licencia)
 
 ---
 
